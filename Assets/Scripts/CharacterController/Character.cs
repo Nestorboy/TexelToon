@@ -13,6 +13,8 @@ public class Character : MonoBehaviour
     private Quaternion _initialCameraRotation;
     private float _cameraXEulerOffset;
 
+    private Vector3 _velocity;
+
     private void Awake()
     {
         _cc = GetComponent<CharacterController>();
@@ -32,6 +34,9 @@ public class Character : MonoBehaviour
     {
         ApplyLook();
         ApplyWalk();
+        ApplyGravity();
+
+        _cc.Move(_velocity * Time.deltaTime);
     }
 
     private void ApplyLook()
@@ -52,7 +57,15 @@ public class Character : MonoBehaviour
 
         inputMoveVector.Normalize();
 
-        Vector3 moveVector = transform.rotation * new Vector3(inputMoveVector.x, 0f, inputMoveVector.y);
-        _cc.SimpleMove(moveVector * WalkSpeed);
+        Vector3 moveVector = transform.rotation * new Vector3(inputMoveVector.x, 0f, inputMoveVector.y) * WalkSpeed;
+        _velocity.x = moveVector.x;
+        _velocity.z = moveVector.z;
+    }
+
+    private void ApplyGravity()
+    {
+        Vector3 gravity = Physics.gravity;
+        if (_cc.isGrounded) _velocity = Vector3.ProjectOnPlane(_velocity, gravity);
+        _velocity += gravity * Time.deltaTime;
     }
 }
