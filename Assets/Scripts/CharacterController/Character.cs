@@ -5,7 +5,8 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     [SerializeField] private Camera PlayerCamera;
-    [SerializeField] private float WalkSpeed = 3.0f;
+    [SerializeField] private float WalkSpeed = 3f;
+    [SerializeField] private float JumpForce = 5f;
 
     private CharacterController _cc;
 
@@ -32,11 +33,21 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
+        ApplyGround();
         ApplyLook();
         ApplyWalk();
+        ApplyJump();
         ApplyGravity();
 
         _cc.Move(_velocity * Time.deltaTime);
+    }
+
+    private void ApplyGround()
+    {
+        if (!_cc.isGrounded) return;
+
+        Vector3 gravity = Physics.gravity;
+        _velocity = Vector3.ProjectOnPlane(_velocity, gravity);
     }
 
     private void ApplyLook()
@@ -62,10 +73,18 @@ public class Character : MonoBehaviour
         _velocity.z = moveVector.z;
     }
 
+    private void ApplyJump()
+    {
+        if (Input.GetAxis("Jump") <= 0f) return;
+
+        if (!_cc.isGrounded) return;
+
+        _velocity += Vector3.up * JumpForce;
+    }
+
     private void ApplyGravity()
     {
         Vector3 gravity = Physics.gravity;
-        if (_cc.isGrounded) _velocity = Vector3.ProjectOnPlane(_velocity, gravity);
         _velocity += gravity * Time.deltaTime;
     }
 }
