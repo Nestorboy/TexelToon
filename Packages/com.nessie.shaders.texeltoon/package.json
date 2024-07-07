@@ -1,0 +1,15 @@
+{
+  "name": "com.nessie.shaders.texeltoon",
+  "displayName": "Texel Toon",
+  "version": "0.4.0",
+  "description": "A shader that does texel based shading for a more stylized pixel look.",
+  "license": "MIT",
+  "gitDependencies": {},
+  "vpmDependencies": {},
+  "author": {
+    "name": "Nestorboy",
+    "url": "https://github.com/Nestorboy"
+  },
+  "legacyFolders": {},
+  "legacyFiles": {}
+}
