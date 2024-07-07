@@ -30,16 +30,22 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
-        // Character rotation.
+        ApplyLook();
+        ApplyWalk();
+    }
+
+    private void ApplyLook()
+    {
         transform.Rotate(0f, Input.GetAxis("Mouse X") * 2f, 0f);
 
-        // Camera rotation.
         _cameraXEulerOffset += -Input.GetAxis("Mouse Y") * 2f;
         _cameraXEulerOffset = Mathf.Clamp(_cameraXEulerOffset, -90f, 90f);
 
         _cameraTransform.localRotation = _initialCameraRotation * Quaternion.Euler(new Vector3(_cameraXEulerOffset, 0f, 0f));
+    }
 
-        // Character movement.
+    private void ApplyWalk()
+    {
         Vector2 inputMoveVector = default;
         inputMoveVector += Vector2.right * Input.GetAxis("Horizontal");
         inputMoveVector += Vector2.up * Input.GetAxis("Vertical");
