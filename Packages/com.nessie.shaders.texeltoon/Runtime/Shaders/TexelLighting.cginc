@@ -26,10 +26,11 @@ struct Attributes
 struct Varyings
 {
     float4 pos : SV_POSITION;
-    centroid float2 uv : TEXCOORD0;
+    float2 uv : TEXCOORD0;
     float3 normal : TEXCOORD1;
     float4 tangent : TEXCOORD2;
     float3 worldPos : TEXCOORD3;
+    centroid float2 uvCentroid : TEXCOORD9;
 
     #if defined(VERTEXLIGHT_ON)
         float3 vertexLightColor : TEXCOORD4;
@@ -63,7 +64,7 @@ UnityLight CreateLight(Varyings input)
     // TODO: Fix spotlight mip artifacts.
     UNITY_LIGHT_ATTENUATION(attenuation, input, input.worldPos);
     float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-    attenuation *= GetOcclusion(input.uv, ddxy);
+    attenuation *= GetOcclusion(input.uvCentroid, ddxy);
 
     light.color = _LightColor0.rgb * attenuation;
 
@@ -138,7 +139,7 @@ UnityIndirect CreateIndirect(Varyings input, float3 viewDir)
         indirect.specular = ComputeSpecular(input, viewDir);
 
         float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-        float occlusion = GetOcclusion(input.uv, ddxy);
+        float occlusion = GetOcclusion(input.uvCentroid, ddxy);
         indirect.diffuse *= occlusion;
         indirect.specular *= occlusion;
     #endif
@@ -184,6 +185,7 @@ Varyings TexelVert(Attributes input)
     output.normal = UnityObjectToWorldNormal(input.normal);
     output.tangent = float4(UnityObjectToWorldDir(input.tangent.xyz), input.tangent.w);
     output.uv = TRANSFORM_TEX(input.uv, _MainTex);
+    output.uvCentroid = output.uv;
     // The object pivot position is ignored here and it will be added after texel snapping to improve the precision of it.
     output.worldPos = mul(unity_ObjectToWorld, float4(input.vertex.xyz, 0));
 
@@ -242,19 +244,20 @@ void InitializeFragmentInterpolators(inout Varyings input)
 half4 TexelFrag(Varyings input) : SV_Target
 {
     float2 uv = input.uv;
+    float2 uvC = input.uvCentroid;
     InitializeFragmentInterpolators(input);
     InitializeFragmentNormal(input);
 
     // Compute derivatives of regular uv for proper mips when using TexelAA.
     float4 ddxy = float4(ddx(uv), ddy(uv));
 
-    half4 albedo = GetAlbedo(uv, ddxy);
+    half4 albedo = GetAlbedo(uvC, ddxy);
     #if defined(_ALPHATEST_ON)
         clip(albedo.a - _Cutoff + 0.0001);
     #endif
 
     // TODO: Figure out proper metallic + glossiness workflow.
-    half metallic = GetMetallic(uv, ddxy);
+    half metallic = GetMetallic(uvC, ddxy);
     half3 specularTint;
     half oneMinusReflectivity;
     albedo.rgb = DiffuseAndSpecularFromMetallic(albedo, metallic, specularTint, oneMinusReflectivity);
@@ -273,7 +276,7 @@ half4 TexelFrag(Varyings input) : SV_Target
         light, indirect);
 
     #if defined(UNITY_PASS_FORWARDBASE)
-        finalColor.rgb += GetEmission(input.uv, ddxy);
+        finalColor.rgb += GetEmission(uvC, ddxy);
     #endif
 
     int width, height;
