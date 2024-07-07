@@ -20,6 +20,14 @@ public class Character : MonoBehaviour
         _initialCameraRotation = _cameraTransform.localRotation;
     }
 
+    private void OnApplicationFocus(bool hasFocus)
+    {
+        if (hasFocus)
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+    }
+
     private void Update()
     {
         // Character rotation.
