@@ -26,7 +26,7 @@ struct Attributes
 struct Varyings
 {
     float4 pos : SV_POSITION;
-    float2 uv : TEXCOORD0;
+    centroid float2 uv : TEXCOORD0;
     float3 normal : TEXCOORD1;
     float4 tangent : TEXCOORD2;
     float3 worldPos : TEXCOORD3;
