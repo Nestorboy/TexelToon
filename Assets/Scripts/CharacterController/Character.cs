@@ -9,6 +9,7 @@ public class Character : MonoBehaviour
     [SerializeField] private float JumpForce = 5f;
 
     private CharacterController _cc;
+    private Vector3 _spawnLocation;
 
     private Transform _cameraTransform;
     private Quaternion _initialCameraRotation;
@@ -19,6 +20,7 @@ public class Character : MonoBehaviour
     private void Awake()
     {
         _cc = GetComponent<CharacterController>();
+        _spawnLocation = transform.position;
         _cameraTransform = PlayerCamera.transform;
         _initialCameraRotation = _cameraTransform.localRotation;
     }
@@ -40,6 +42,8 @@ public class Character : MonoBehaviour
         ApplyGravity();
 
         _cc.Move(_velocity * Time.deltaTime);
+
+        ApplyRespawn();
     }
 
     private void ApplyGround()
@@ -86,5 +90,14 @@ public class Character : MonoBehaviour
     {
         Vector3 gravity = Physics.gravity;
         _velocity += gravity * Time.deltaTime;
+    }
+
+    private void ApplyRespawn()
+    {
+        Transform ccTransform = _cc.transform;
+        if (ccTransform.position.y < -5f)
+        {
+            ccTransform.position = _spawnLocation;
+        }
     }
 }
