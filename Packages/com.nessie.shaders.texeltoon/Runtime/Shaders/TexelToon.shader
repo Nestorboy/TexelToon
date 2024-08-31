@@ -65,6 +65,7 @@ Shader "Nessie/TexelToon/Lit"
             Name "FORWARD_BASE"
             Tags { "LightMode" = "ForwardBase" }
 
+            //AlphaToMask On
             Blend [_SrcBlend] [_DstBlend]
             ZWrite [_ZWrite]
             Cull [_CullMode]
@@ -96,6 +97,7 @@ Shader "Nessie/TexelToon/Lit"
             Name "FORWARD_ADD"
             Tags { "LightMode" = "ForwardAdd" }
 
+            //AlphaToMask On
             Blend [_SrcBlend] One
             Fog { Color (0,0,0,0) } // in additive pass fog should be black
             ZWrite Off
