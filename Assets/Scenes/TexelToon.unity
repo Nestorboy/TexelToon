@@ -3690,6 +3690,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerCamera: {fileID: 339127368}
   WalkSpeed: 3
+  JumpForce: 5
 --- !u!143 &1669153922
 CharacterController:
   m_ObjectHideFlags: 0
