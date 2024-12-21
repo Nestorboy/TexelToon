@@ -285,8 +285,16 @@ half4 TexelFrag(Varyings input) : SV_Target
     if (hasPaletteLUT)
     {
         #if defined(_DITHER_ON)
+        float4 texelSize;
+        #if defined(_TEXELMODE_AUTO)
+            texelSize = _MainTex_TexelSize;
+        #else
+            texelSize = float4(1 / _TexelDensity.xy, _TexelDensity.xy);
+        #endif
+        texelSize *= float4(1 / _TexelDensityMultiplier.xy, _TexelDensityMultiplier.xy);
+
         // TODO: Improve ID computation.
-        uint2 id = floor(uv * _MainTex_TexelSize.zw * sign(uv) - min(0, sign(uv))) % 4;
+        uint2 id = floor(uv * texelSize.zw * sign(uv) - min(0, sign(uv))) % 4;
         float DITHER_THRESHOLDS[16] =
         {
             1.0 / 17.0,  9.0 / 17.0,  3.0 / 17.0, 11.0 / 17.0,
