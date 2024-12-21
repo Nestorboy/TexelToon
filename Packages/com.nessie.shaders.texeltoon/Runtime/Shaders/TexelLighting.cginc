@@ -253,7 +253,7 @@ half4 TexelFrag(Varyings input) : SV_Target
 
     half4 albedo = GetAlbedo(uvC, ddxy);
     #if defined(_ALPHATEST_ON)
-        clip(albedo.a - _Cutoff + 0.0001);
+        clip(albedo.a - _Cutoff);
     #endif
 
     // TODO: Figure out proper metallic + glossiness workflow.
