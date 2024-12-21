@@ -132,7 +132,8 @@ Shader "Nessie/TexelToon/Lit"
             Name "SHADOWCASTER"
             Tags { "LightMode" = "ShadowCaster" }
 
-            ZWrite On ZTest LEqual
+            ZWrite On
+            ZTest LEqual
             Cull [_CullMode]
 
             CGPROGRAM
