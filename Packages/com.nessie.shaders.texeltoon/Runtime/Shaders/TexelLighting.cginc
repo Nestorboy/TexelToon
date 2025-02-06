@@ -110,7 +110,7 @@ half3 ComputeSpecular(Varyings input, float3 viewDir)
     return specular;
 }
 
-UnityIndirect CreateIndirect(Varyings input, float3 viewDir)
+UnityIndirect CreateIndirect(Varyings input, float3 viewDir, float4 linearAmbientOrLightmap)
 {
     UnityIndirect indirect;
     indirect.diffuse = 0;
@@ -136,7 +136,8 @@ UnityIndirect CreateIndirect(Varyings input, float3 viewDir)
 
     #if defined(UNITY_PASS_FORWARDBASE)
         #if defined(LIGHTMAP_ON)
-            indirect.diffuse = DecodeLightmap(UNITY_SAMPLE_TEX2D(unity_Lightmap, input.ambientOrLightmapUV));
+            float4 ddxyLightmap = float4(ddx(linearAmbientOrLightmap.xy), ddy(linearAmbientOrLightmap.xy));
+            indirect.diffuse = DecodeLightmap(UNITY_SAMPLE_TEX2D_GRAD(unity_Lightmap, input.ambientOrLightmapUV, ddxyLightmap.xy, ddxyLightmap.zw));
 
             #if defined(DIRLIGHTMAP_COMBINED)
                 float4 lightmapDirection = UNITY_SAMPLE_TEX2D_SAMPLER(unity_LightmapInd, unity_Lightmap, input.ambientOrLightmapUV);
@@ -256,6 +257,8 @@ half4 TexelFrag(Varyings input) : SV_Target
 {
     // TODO: Create better texel struct with linear source data.
     float3 worldPos = input.worldPos;
+    float4 ambientOrLightMapUV = input.ambientOrLightmapUV;
+
     float2 uv = input.uv;
     float2 uvC = input.uvCentroid;
     InitializeFragmentInterpolators(input);
@@ -280,7 +283,7 @@ half4 TexelFrag(Varyings input) : SV_Target
     float3 viewDir = normalize(_CenteredCameraPos - input.worldPos);
 
     LightAndAttenuation lightAttenuation = CreateLight(input, worldPos);
-    UnityIndirect indirect = CreateIndirect(input, viewDir);
+    UnityIndirect indirect = CreateIndirect(input, viewDir, ambientOrLightMapUV);
 
     half4 finalColor = UNITY_BRDF_PBS( // TODO: Figure out why macro can't be resolved.
     //float4 finalColor = BRDF3_Unity_PBS(
