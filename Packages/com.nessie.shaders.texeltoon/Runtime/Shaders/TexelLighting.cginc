@@ -118,7 +118,7 @@ UnityIndirect CreateIndirect(Varyings input, float3 viewDir)
     indirect.specular = 0;
 
     #if defined(VERTEXLIGHT_ON)
-        indirect.diffuse = i.vertexLightColor;
+        indirect.diffuse = input.vertexLightColor;
     #endif
 
     float4 lightmapUV;
