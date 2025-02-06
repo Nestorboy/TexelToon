@@ -52,7 +52,6 @@ struct LightAndAttenuation
     float attenuation;
 };
 
-// TODO: Create better texel struct with linear source data.
 LightAndAttenuation CreateLight(Varyings input, float3 linearWorldPos)
 {
     UnityLight light;
@@ -255,6 +254,7 @@ void InitializeFragmentInterpolators(inout Varyings input)
 
 half4 TexelFrag(Varyings input) : SV_Target
 {
+    // TODO: Create better texel struct with linear source data.
     float3 worldPos = input.worldPos;
     float2 uv = input.uv;
     float2 uvC = input.uvCentroid;
