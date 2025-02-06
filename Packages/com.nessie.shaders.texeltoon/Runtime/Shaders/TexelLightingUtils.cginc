@@ -23,61 +23,29 @@ float2 ComputeTexelOffset(float2 uv, float4 texelSize)
     return dST;
 }
 
-float4 TexelSnap(float4 value, float2 uv, float4 texelSize)
-{
-    float2 xyOffset = ComputeTexelOffset(uv, texelSize);
-    
-    float4 dx = ddx(value);
-    float4 dy = ddy(value);
-    
-    float4 valueOffset = dx * xyOffset.x + dy * xyOffset.y;
-    valueOffset = clamp(valueOffset, -1, 1);
-    
-    return value + valueOffset;
+#define TexelSnapTemplate(T)                                                \
+T TexelSnap(T value, float2 uv, float4 texelSize)                           \
+{                                                                           \
+    /* 1. Get the screen space offset to the texel center. */               \
+    float2 xyOffset = ComputeTexelOffset(uv, texelSize);                    \
+                                                                            \
+    /* 2. Calculate how much the world coords vary over fragment space. */  \
+    T dx = ddx(value);                                                      \
+    T dy = ddy(value);                                                      \
+                                                                            \
+    /* 3. Finally, convert our fragment space delta to a world space delta.
+       And be sure to clamp it in case the derivative calc went insane. */  \
+    T valueOffset = dx * xyOffset.x + dy * xyOffset.y;                      \
+    valueOffset = clamp(valueOffset, -1, 1);                                \
+                                                                            \
+    /* 4. Transform the snapped UV back to world space. */                  \
+    return value + valueOffset;                                             \
 }
 
-float3 TexelSnap(float3 value, float2 uv, float4 texelSize)
-{
-    // 1. Get the screen space offset to the texel center.
-    float2 xyOffset = ComputeTexelOffset(uv, texelSize);
-     
-    // 2. Calculate how much the world coords vary over fragment space.
-    float3 dx = ddx(value);
-    float3 dy = ddy(value);
-     
-    // 3. Finally, convert our fragment space delta to a world space delta. And be sure to clamp it in case the derivative calc went insane.
-    float3 valueOffset = dx * xyOffset.x + dy * xyOffset.y;
-    valueOffset = clamp(valueOffset, -1, 1);
-     
-    // 4. Transform the snapped UV back to world space.
-    return value + valueOffset;
-}
-
-float2 TexelSnap(float2 value, float2 uv, float4 texelSize)
-{
-    float2 xyOffset = ComputeTexelOffset(uv, texelSize);
-
-    float2 dx = ddx(value);
-    float2 dy = ddy(value);
-    
-    float2 valueOffset = dx * xyOffset.x + dy * xyOffset.y;
-    valueOffset = clamp(valueOffset, -1, 1);
-    
-    return value + valueOffset;
-}
-
-float TexelSnap(float value, float2 uv, float4 texelSize)
-{
-    float2 xyOffset = ComputeTexelOffset(uv, texelSize);
-
-    float dx = ddx(value);
-    float dy = ddy(value);
-    
-    float valueOffset = dx * xyOffset.x + dy * xyOffset.y;
-    valueOffset = clamp(valueOffset, -1, 1);
-
-    return value + valueOffset;
-}
+TexelSnapTemplate(float4)
+TexelSnapTemplate(float3)
+TexelSnapTemplate(float2)
+TexelSnapTemplate(float)
 
 float2 TexelStep(float2 uv, float4 texelSize)
 {
