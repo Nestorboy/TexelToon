@@ -3,11 +3,12 @@
 
 #include "AutoLight.cginc"
 
+//#define POINT
 #ifdef POINT
     #define TEXEL_LIGHT_ATTENUATION(destName, input, worldPos, linearWorldPos) \
         unityShadowCoord3 lightCoord = mul(unity_WorldToLight, unityShadowCoord4(worldPos, 1)).xyz; \
         fixed shadow = UNITY_SHADOW_ATTENUATION(input, worldPos); \
-        fixed destName = tex2D(_LightTexture0, dot(lightCoord, lightCoord).rr).r * shadow;
+        fixed destName = tex2Dgrad(_LightTexture0, dot(lightCoord, lightCoord).rr, ddx(linearWorldPos), ddy(linearWorldPos)).r * shadow;
 #endif
 
 //#define SPOT
