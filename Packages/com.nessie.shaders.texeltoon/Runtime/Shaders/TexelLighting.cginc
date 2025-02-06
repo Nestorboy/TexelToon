@@ -2,7 +2,7 @@
 #define TEXEL_LIGHTING_INCLUDED
 
 #include "UnityPBSLighting.cginc"
-#include "AutoLight.cginc"
+#include "TexelAutoLight.cginc"
 #include "TexelLightingInput.cginc"
 #include "TexelLightingUtils.cginc"
 #include "CGIncludes/VRChatShaderGlobals.cginc"
@@ -52,7 +52,8 @@ struct LightAndAttenuation
     float attenuation;
 };
 
-LightAndAttenuation CreateLight(Varyings input)
+// TODO: Create better texel struct with linear source data.
+LightAndAttenuation CreateLight(Varyings input, float3 linearWorldPos)
 {
     UnityLight light;
 
@@ -68,7 +69,7 @@ LightAndAttenuation CreateLight(Varyings input)
     #endif
     // TODO: Figure out way to combat center sample being occluded.
     // TODO: Fix spotlight mip artifacts.
-    UNITY_LIGHT_ATTENUATION(attenuation, input, input.worldPos);
+    TEXEL_LIGHT_ATTENUATION(attenuation, input, input.worldPos, linearWorldPos);
     #if defined(FORWARD_BASE_PASS)
         float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
         attenuation *= GetOcclusion(input.uvCentroid, ddxy);
@@ -254,6 +255,7 @@ void InitializeFragmentInterpolators(inout Varyings input)
 
 half4 TexelFrag(Varyings input) : SV_Target
 {
+    float3 worldPos = input.worldPos;
     float2 uv = input.uv;
     float2 uvC = input.uvCentroid;
     InitializeFragmentInterpolators(input);
@@ -277,7 +279,7 @@ half4 TexelFrag(Varyings input) : SV_Target
 
     float3 viewDir = normalize(_CenteredCameraPos - input.worldPos);
 
-    LightAndAttenuation lightAttenuation = CreateLight(input);
+    LightAndAttenuation lightAttenuation = CreateLight(input, worldPos);
     UnityIndirect indirect = CreateIndirect(input, viewDir);
 
     half4 finalColor = UNITY_BRDF_PBS( // TODO: Figure out why macro can't be resolved.
