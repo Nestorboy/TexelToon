@@ -46,7 +46,13 @@ struct Varyings
     UNITY_VERTEX_OUTPUT_STEREO
 };
 
-UnityLight CreateLight(Varyings input)
+struct LightAndAttenuation
+{
+    UnityLight light;
+    float attenuation;
+};
+
+LightAndAttenuation CreateLight(Varyings input)
 {
     UnityLight light;
 
@@ -72,7 +78,10 @@ UnityLight CreateLight(Varyings input)
 
     light.ndotl = DotClamped(input.normal, light.dir);
 
-    return light;
+    LightAndAttenuation la;
+    la.light = light;
+    la.attenuation = attenuation;
+    return la;
 }
 
 half3 ComputeSpecular(Varyings input, float3 viewDir)
@@ -268,14 +277,14 @@ half4 TexelFrag(Varyings input) : SV_Target
 
     float3 viewDir = normalize(_CenteredCameraPos - input.worldPos);
 
-    UnityLight light = CreateLight(input);
+    LightAndAttenuation lightAttenuation = CreateLight(input);
     UnityIndirect indirect = CreateIndirect(input, viewDir);
 
     half4 finalColor = UNITY_BRDF_PBS( // TODO: Figure out why macro can't be resolved.
     //float4 finalColor = BRDF3_Unity_PBS(
         albedo, specularTint, oneMinusReflectivity, glossiness,
         input.normal, viewDir,
-        light, indirect);
+        lightAttenuation.light, indirect);
 
     #if defined(UNITY_PASS_FORWARDBASE)
         finalColor.rgb += GetEmission(uvC, ddxy);
@@ -284,7 +293,11 @@ half4 TexelFrag(Varyings input) : SV_Target
     int width, height;
     _ColorLUT.GetDimensions(width, height);
     bool hasPaletteLUT = width != 4 || height != 4;
-    if (hasPaletteLUT)
+    bool applyLUT = hasPaletteLUT;
+    #if defined(UNITY_PASS_FORWARDADD)
+        applyLUT = applyLUT && lightAttenuation.attenuation != 0;
+    #endif
+    if (applyLUT)
     {
         #if defined(_DITHER_ON)
         float4 texelSize;
