@@ -8,12 +8,12 @@ float2 ComputeTexelOffset(float2 uv, float4 texelSize)
     // 1. Calculate how much the texture UV coords need to shift to be at the center of the nearest texel.
     float2 uvCenter = (floor(uv * texelSize.zw) + 0.5) * texelSize.xy;
     float2 dUV = uvCenter - uv;
-     
+
     // 2. Calculate how much the texture coords vary over fragment space.
-    //     This essentially defines a 2x2 matrix that gets texture space (UV) deltas from fragment space (ST) deltas.
+    //    This essentially defines a 2x2 matrix that gets texture space (UV) deltas from fragment space (ST) deltas.
     float2 dUVdS = ddx(uv);
     float2 dUVdT = ddy(uv);
-     
+
     // 3. Invert the texture delta from fragment delta matrix. Where the magic happens.
     float2x2 dSTdUV = float2x2(dUVdT[1], -dUVdT[0], -dUVdS[1], dUVdS[0]) * (1.0 / (dUVdS[0] * dUVdT[1] - dUVdT[0] * dUVdS[1]));
 
@@ -23,23 +23,23 @@ float2 ComputeTexelOffset(float2 uv, float4 texelSize)
     return dST;
 }
 
-#define TexelSnapTemplate(T)                                                \
-T TexelSnap(T value, float2 uv, float4 texelSize)                           \
-{                                                                           \
-    /* 1. Get the screen space offset to the texel center. */               \
-    float2 xyOffset = ComputeTexelOffset(uv, texelSize);                    \
-                                                                            \
-    /* 2. Calculate how much the world coords vary over fragment space. */  \
-    T dx = ddx(value);                                                      \
-    T dy = ddy(value);                                                      \
-                                                                            \
+#define TexelSnapTemplate(T)                                                    \
+T TexelSnap(T value, float2 uv, float4 texelSize)                               \
+{                                                                               \
+    /* 1. Get the screen space offset to the texel center. */                   \
+    float2 xyOffset = ComputeTexelOffset(uv, texelSize);                        \
+                                                                                \
+    /* 2. Calculate how much the world coords vary over fragment space. */      \
+    T dx = ddx(value);                                                          \
+    T dy = ddy(value);                                                          \
+                                                                                \
     /* 3. Finally, convert our fragment space delta to a world space delta.
-       And be sure to clamp it in case the derivative calc went insane. */  \
-    T valueOffset = dx * xyOffset.x + dy * xyOffset.y;                      \
-    valueOffset = clamp(valueOffset, -1, 1);                                \
-                                                                            \
-    /* 4. Transform the snapped UV back to world space. */                  \
-    return value + valueOffset;                                             \
+          And be sure to clamp it in case the derivative calc went insane. */   \
+    T valueOffset = dx * xyOffset.x + dy * xyOffset.y;                          \
+    valueOffset = clamp(valueOffset, -1, 1);                                    \
+                                                                                \
+    /* 4. Transform the snapped UV back to world space. */                      \
+    return value + valueOffset;                                                 \
 }
 
 TexelSnapTemplate(float4)
