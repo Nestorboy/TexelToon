@@ -63,8 +63,10 @@ UnityLight CreateLight(Varyings input)
     // TODO: Figure out way to combat center sample being occluded.
     // TODO: Fix spotlight mip artifacts.
     UNITY_LIGHT_ATTENUATION(attenuation, input, input.worldPos);
-    float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-    attenuation *= GetOcclusion(input.uvCentroid, ddxy);
+    #if defined(FORWARD_BASE_PASS)
+        float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
+        attenuation *= GetOcclusion(input.uvCentroid, ddxy);
+    #endif
 
     light.color = _LightColor0.rgb * attenuation;
 
