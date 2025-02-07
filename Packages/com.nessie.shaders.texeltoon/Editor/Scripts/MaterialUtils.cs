@@ -59,7 +59,7 @@ namespace Nessie.Shader.Texel.Editor
                     ms.RenderType = "Transparent";
                     ms.Queue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
                     
-                    ms.SrcBlend = (float)UnityEngine.Rendering.BlendMode.One;
+                    ms.SrcBlend = (float)UnityEngine.Rendering.BlendMode.SrcAlpha;
                     ms.DstBlend = (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha;
                     ms.ZWrite = 0f;
 
