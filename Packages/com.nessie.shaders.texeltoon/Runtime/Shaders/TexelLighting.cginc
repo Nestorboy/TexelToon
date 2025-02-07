@@ -245,9 +245,9 @@ void InitializeFragmentInterpolators(inout Varyings input)
     input.worldPos = TexelSnap(input.worldPos, uv, texelSize);
     input.worldPos += MATRIX_TRANSLATION(unity_ObjectToWorld);
 
-    #if defined(LIGHTMAP_ON)
+    //#if defined(LIGHTMAP_ON)
         input.ambientOrLightmapUV = TexelSnap(input.ambientOrLightmapUV, uv, texelSize);
-    #endif
+    //#endif
 
     input.normal = normalize(input.normal);
     input.tangent.xyz = normalize(input.tangent.xyz);
