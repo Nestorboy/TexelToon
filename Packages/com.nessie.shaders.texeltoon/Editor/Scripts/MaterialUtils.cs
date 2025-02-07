@@ -50,7 +50,7 @@ namespace Nessie.Shader.Texel.Editor
                     ms.Queue = (int)UnityEngine.Rendering.RenderQueue.AlphaTest;
                     
                     ms.SrcBlend = (float)UnityEngine.Rendering.BlendMode.One;
-                    ms.DstBlend = (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha;
+                    ms.DstBlend = (float)UnityEngine.Rendering.BlendMode.Zero;
                     ms.ZWrite = 1f;
 
                     ms.AlphaTest = true;
