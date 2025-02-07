@@ -84,7 +84,6 @@ namespace Nessie.Shader.Texel.Editor
                 _initialized = true;
 
                 // Temporary solution.
-                Styles.BlendNames[2] += " (Not Implemented)";
                 Styles.BlendNames[3] += " (Not Implemented)";
             }
 
@@ -128,7 +127,7 @@ namespace Nessie.Shader.Texel.Editor
             MaterialUtils.BlendMode mode = (MaterialUtils.BlendMode)_propRenderingMode.floatValue;
             using EditorGUI.ChangeCheckScope check = new EditorGUI.ChangeCheckScope();
             mode = (MaterialUtils.BlendMode)EditorGUILayout.Popup(Styles.RenderingMode, (int)mode, Styles.BlendNames);
-            bool validMode = mode is MaterialUtils.BlendMode.Opaque or MaterialUtils.BlendMode.Cutout;
+            bool validMode = mode is MaterialUtils.BlendMode.Opaque or MaterialUtils.BlendMode.Cutout or MaterialUtils.BlendMode.Fade;
             if (check.changed && validMode)
             {
                 _editor.RegisterPropertyChangeUndo("Rendering Mode");
