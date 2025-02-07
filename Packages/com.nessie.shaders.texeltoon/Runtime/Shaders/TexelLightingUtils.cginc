@@ -97,7 +97,7 @@ float3 BoxProjection(float3 direction, float3 position, float4 cubemapPosition, 
     return direction;
 }
 
-#if defined(SHADER_API_D3D11) || defined(UNITY_COMPILER_HLSLCC) || defined(SHADER_API_PSSL) || (defined(SHADER_TARGET_SURFACE_ANALYSIS) && !defined(SHADER_TARGET_SURFACE_ANALYSIS_MOJOSHADER))
+#ifdef UNITY_SEPARATE_TEXTURE_SAMPLER
     #define UNITY_SAMPLE_TEX2D_GRAD(tex,coord,ddx,ddy) tex.SampleGrad (sampler##tex, coord, ddx, ddy)
 #else
     #define UNITY_SAMPLE_TEX2D_GRAD(tex,coord,ddx,ddy) tex2Dgrad (sampler##tex, coord, ddx, ddy)
