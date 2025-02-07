@@ -220,9 +220,13 @@ Shader "Nessie/TexelToon/Lit"
                 return output;
             }
 
+            #if defined(_ALPHATEST_ON) || defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+                #define USE_ALPHA
+            #endif
+
             fixed4 Frag(Varyings input) : SV_Target
             {
-                #if defined(_ALPHATEST_ON) || defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+                #ifdef USE_ALPHA
                     float2 uv = input.uv;
                     float4 ddxy = float4(ddx(uv), ddy(uv));
                     fixed4 albedo = GetAlbedo(uv, ddxy);
