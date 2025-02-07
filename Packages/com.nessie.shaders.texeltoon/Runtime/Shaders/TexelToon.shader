@@ -230,7 +230,11 @@ Shader "Nessie/TexelToon/Lit"
                     float2 uv = input.uv;
                     float4 ddxy = float4(ddx(uv), ddy(uv));
                     fixed4 albedo = GetAlbedo(uv, ddxy);
-                    clip(albedo.a - _Cutoff + 0.0001);
+                    #if defined(_ALPHATEST_ON)
+                        clip(albedo.a - _Cutoff + 0.0001);
+                    #else
+                        clip(albedo.a - 0.0001);
+                    #endif
                 #endif
 
                 return 1;
