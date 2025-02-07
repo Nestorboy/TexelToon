@@ -3,6 +3,16 @@
 
 #include "AutoLight.cginc"
 
+#ifdef DECLARE_LIGHT_COORD
+    #undef DECLARE_LIGHT_COORD
+#endif
+
+#if !defined(UNITY_HALF_PRECISION_FRAGMENT_SHADER_REGISTERS)
+    #define GET_LIGHT_COORD(input, worldPos) mul(unity_WorldToLight, unityShadowCoord4(worldPos, 1))
+#else
+    #define GET_LIGHT_COORD(input, worldPos) (input._LightCoord)
+#endif
+
 //#define POINT
 #ifdef POINT
     #define TEXEL_LIGHT_ATTENUATION(destName, input, worldPos, linearWorldPos) \
@@ -25,11 +35,7 @@
         return tex2Dgrad(_LightTextureB0, dot(lightCoord, lightCoord).xx, ddx(realLightCoord), ddy(realLightCoord)).r;
     }
 
-    #if !defined(UNITY_HALF_PRECISION_FRAGMENT_SHADER_REGISTERS)
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord4 destName = mul(unity_WorldToLight, unityShadowCoord4(worldPos, 1))
-    #else
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord4 destName = input._LightCoord
-    #endif
+    #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord4 destName = GET_LIGHT_COORD(input, worldPos)
 
     #define TEXEL_LIGHT_ATTENUATION(destName, input, worldPos, linearWorldPos) \
         DECLARE_LIGHT_COORD(lightCoord, input, worldPos); \
@@ -44,11 +50,7 @@
 
 //#define POINT_COOKIE
 #ifdef POINT_COOKIE
-    #if !defined(UNITY_HALF_PRECISION_FRAGMENT_SHADER_REGISTERS)
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord3 destName = mul(unity_WorldToLight, unityShadowCoord4(worldPos, 1)).xyz
-    #else
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord3 destName = input._LightCoord
-    #endif
+    #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord3 destName = GET_LIGHT_COORD(input, worldPos).xyz
 
     #define TEXEL_LIGHT_ATTENUATION(destName, input, worldPos, linearWorldPos) \
         DECLARE_LIGHT_COORD(lightCoord, input, worldPos); \
@@ -61,11 +63,7 @@
 
 //#define DIRECTIONAL_COOKIE
 #ifdef DIRECTIONAL_COOKIE
-    #if !defined(UNITY_HALF_PRECISION_FRAGMENT_SHADER_REGISTERS)
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord2 destName = mul(unity_WorldToLight, unityShadowCoord4(worldPos, 1)).xy
-    #else
-        #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord2 destName = input._LightCoord
-    #endif
+    #define DECLARE_LIGHT_COORD(destName, input, worldPos) unityShadowCoord2 destName = GET_LIGHT_COORD(input, worldPos).xy
 
     #define TEXEL_LIGHT_ATTENUATION(destName, input, worldPos, linearWorldPos) \
         DECLARE_LIGHT_COORD(lightCoord, input, worldPos); \
