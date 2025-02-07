@@ -295,6 +295,10 @@ half4 TexelFrag(Varyings input) : SV_Target
         finalColor.rgb += GetEmission(uvC, ddxy);
     #endif
 
+    #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
+        finalColor.a = albedo.a;
+    #endif
+
     int width, height;
     _ColorLUT.GetDimensions(width, height);
     bool hasPaletteLUT = width != 4 || height != 4;
