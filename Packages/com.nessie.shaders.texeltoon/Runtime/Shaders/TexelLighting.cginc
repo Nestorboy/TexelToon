@@ -323,7 +323,7 @@ half4 TexelFrag(Varyings input) : SV_Target
             16.0 / 17.0,  8.0 / 17.0, 14.0 / 17.0,  6.0 / 17.0
         };
         // TODO: Consider exposing strength.
-        finalColor += (DITHER_THRESHOLDS[id.x * 4 + id.y % 4] - 0.5) / 512.;
+        finalColor.rgb += (DITHER_THRESHOLDS[id.x * 4 + id.y % 4] - 0.5) / 512.;
         #endif
 
         finalColor.rgb = ApplyPointLut2D(_ColorLUT, finalColor.rgb, float3(_ColorLUT_TexelSize.xy, _ColorLUT_TexelSize.w - 1));
