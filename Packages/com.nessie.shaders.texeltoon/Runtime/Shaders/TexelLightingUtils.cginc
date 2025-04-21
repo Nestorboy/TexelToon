@@ -47,7 +47,7 @@ TexelSnapTemplate(float3)
 TexelSnapTemplate(float2)
 TexelSnapTemplate(float)
 
-float2 TexelStep(float2 uv, float4 texelSize)
+float2 PixelateUV(float2 uv, float4 texelSize)
 {
     return (floor(uv * texelSize.zw) + .5) * texelSize.xy;
 }
@@ -57,7 +57,7 @@ float2 TexelAA(float2 uv, float4 texelSize) // TODO: Figure out solution for int
 {
     #if !defined(_TEXEL_AA_ON) // TODO: Move define to separate uv calc function meant for shader to isolate TexelAA responsibility.
         //return uv;
-        return TexelStep(uv, texelSize);
+        return PixelateUV(uv, texelSize);
     #endif
     float2 boxSize = clamp(fwidth(uv) * texelSize.zw, 1e-5, 1);
     float2 tx = uv * texelSize.zw - .5 * boxSize;

@@ -46,7 +46,7 @@ half4 GetAlbedo(float2 uv, float4 ddxy)
 // Can't use TexelAA since it determines how sharp reflections are and it would make them spread out more.
 half GetSmoothness(float2 uv, float4 ddxy)
 {
-    half glossMap = UNITY_SAMPLE_TEX2D_GRAD(_SpecGlossMap, TexelStep(uv, _SpecGlossMap_TexelSize), ddxy.xy, ddxy.zw);
+    half glossMap = UNITY_SAMPLE_TEX2D_GRAD(_SpecGlossMap, PixelateUV(uv, _SpecGlossMap_TexelSize), ddxy.xy, ddxy.zw);
     return glossMap * _Glossiness;
 }
 
@@ -59,7 +59,7 @@ half GetMetallic(float2 uv, float4 ddxy)
 // Can't make use of TexelAA since data would mess with lighting calculations and cause artifacts.
 half3 GetTangentSpaceNormal(float2 uv, float4 ddxy)
 {
-    half4 packedNormal = UNITY_SAMPLE_TEX2D_GRAD(_BumpMap, TexelStep(uv, _MainTex_TexelSize), ddxy.xy, ddxy.zw);
+    half4 packedNormal = UNITY_SAMPLE_TEX2D_GRAD(_BumpMap, PixelateUV(uv, _MainTex_TexelSize), ddxy.xy, ddxy.zw);
     return UnpackScaleNormal(packedNormal, _BumpScale);
 }
 
