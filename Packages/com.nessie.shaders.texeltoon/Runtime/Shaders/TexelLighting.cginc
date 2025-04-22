@@ -87,8 +87,7 @@ LightAndAttenuation CreateLight(Varyings input, float3 linearWorldPos)
 half3 ComputeSpecular(Varyings input, float3 viewDir)
 {
     float3 reflDir = reflect(-viewDir, input.normal);
-    float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-    float glossiness = GetSmoothness(TexelAA(input.uv, _SpecGlossMap_TexelSize), ddxy);
+    float glossiness = GetSmoothness(input.uv);
     
     Unity_GlossyEnvironmentData envData;
     envData.roughness =  1 - glossiness;
@@ -150,8 +149,7 @@ UnityIndirect CreateIndirect(Varyings input, float3 viewDir, float4 linearAmbien
         
         indirect.specular = ComputeSpecular(input, viewDir);
 
-        float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-        float occlusion = GetOcclusion(input.uvCentroid, ddxy);
+        float occlusion = GetOcclusion(input.uvCentroid);
         indirect.diffuse *= occlusion;
         indirect.specular *= occlusion;
     #endif
@@ -217,8 +215,7 @@ Varyings TexelVert(Attributes input)
 
 void InitializeFragmentNormal(inout Varyings input)
 {
-    float4 ddxy = float4(ddx(input.uv), ddy(input.uv));
-    float3 tangentNormal = GetTangentSpaceNormal(input.uv, ddxy);
+    float3 tangentNormal = GetTangentSpaceNormal(input.uv);
     half sign = input.tangent.w * unity_WorldTransformParams.w;
     float3 binormal = cross(input.normal, input.tangent.xyz) * sign;
     input.normal = normalize(
@@ -265,20 +262,19 @@ half4 TexelFrag(Varyings input) : SV_Target
     InitializeFragmentNormal(input);
 
     // Compute derivatives of regular uv for proper mips when using TexelAA.
-    float4 ddxy = float4(ddx(uv), ddy(uv));
 
-    half4 albedo = GetAlbedo(uvC, ddxy);
+    half4 albedo = GetAlbedo(uvC);
     #if defined(_ALPHATEST_ON)
         clip(albedo.a - _Cutoff);
     #endif
 
     // TODO: Figure out proper metallic + glossiness workflow.
-    half metallic = GetMetallic(uvC, ddxy);
+    half metallic = GetMetallic(uvC);
     half3 specularTint;
     half oneMinusReflectivity;
     albedo.rgb = DiffuseAndSpecularFromMetallic(albedo, metallic, specularTint, oneMinusReflectivity);
 
-    float glossiness = GetSmoothness(uv, ddxy);
+    float glossiness = GetSmoothness(uv);
 
     float3 viewDir = normalize(_CenteredCameraPos - input.worldPos);
 
@@ -292,7 +288,7 @@ half4 TexelFrag(Varyings input) : SV_Target
         lightAttenuation.light, indirect);
 
     #if defined(UNITY_PASS_FORWARDBASE)
-        finalColor.rgb += GetEmission(uvC, ddxy);
+        finalColor.rgb += GetEmission(uvC);
     #endif
 
     #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)

@@ -53,8 +53,7 @@ Varyings TexelVertShadow(Attributes input)
 float4 TexelFragShadow(Varyings input) : SV_TARGET
 {
     float2 uv = input.uv;
-    float4 ddxy = float4(ddx(uv), ddy(uv));
-    fixed4 albedo = GetAlbedo(uv, ddxy);
+    fixed4 albedo = GetAlbedo(uv);
     half alpha = albedo.a;
     #if defined(_ALPHATEST_ON)
         clip(alpha - _Cutoff - 0.0001);
