@@ -1,2 +1,2 @@
-# Texel Toon
-Emulated texel space shading.
+# Texel Toon (Beta)
+Emulates texel space shading using screen space derivatives.
