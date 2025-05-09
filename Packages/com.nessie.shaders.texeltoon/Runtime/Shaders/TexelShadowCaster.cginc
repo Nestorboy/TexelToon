@@ -63,7 +63,7 @@ float4 TexelFragShadow(Varyings input) : SV_TARGET
     #if defined(_ALPHABLEND_ON) || defined(_ALPHAPREMULTIPLY_ON)
         #if defined(_ALPHAPREMULTIPLY_ON)
             half outModifiedAlpha;
-            PreMultiplyAlpha(half3(0, 0, 0), alpha, SHADOW_ONEMINUSREFLECTIVITY(uv), outModifiedAlpha);
+            PreMultiplyAlpha(half3(0, 0, 0), alpha, OneMinusReflectivityFromMetallic(uv), outModifiedAlpha);
             alpha = outModifiedAlpha;
         #endif
 
