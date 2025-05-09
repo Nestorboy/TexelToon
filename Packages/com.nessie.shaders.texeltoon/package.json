@@ -1,7 +1,7 @@
 {
   "name": "com.nessie.shaders.texeltoon",
   "displayName": "Texel Toon",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "A shader that does texel based shading for a more stylized pixel look.",
   "license": "MIT",
   "gitDependencies": {},
